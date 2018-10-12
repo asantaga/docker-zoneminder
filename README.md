@@ -12,7 +12,7 @@ To install docker in Ubuntu 18.04 use the commands:
 
 ```bash
 sudo apt-get update
-sudo wget -qO- <https://get.docker.com/> | sh
+sudo bash < <(curl -sL https://get.docker.com/)
 ```
 
  To install docker in other operating systems check [docker online documentation][4]
