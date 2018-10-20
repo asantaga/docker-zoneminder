@@ -1,0 +1,43 @@
+version: '3.2'
+
+services:
+  db:
+    image: mysql/mysql-server:5.7
+    hostname: db
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./conf/mysql:/etc/mysql:ro
+    environment:
+     - TZ=Europe/London
+     - MYSQL_USER=zmuser
+     - MYSQL_PASSWORD=zmpass
+     - MYSQL_DATABASE=zm
+     - MYSQL_ROOT_PASSWORD=mysqlpsswd
+     - MYSQL_ROOT_HOST=%
+     - SERVICE_PORTS="81"
+    restart: always
+  web:
+    privileged: true
+    image: myzoneminder2:latest
+    volumes:
+      - /var/empty
+      - /backups:/var/backups
+      - ./zoneminder:/var/cache/zoneminder
+      - /media/2TB/zoneminder/events:/var/cache/zoneminder/events
+      - /media/2TB/zoneminder/images:/var/cache/zoneminder/images
+      - ./zmeventnotification.ini:/etc/zmeventnotification.ini
+      - ./revaliases:/etc/ssmtp/revaliases
+      - ./ssmtp.conf:/etc/ssmtp/ssmtp.conf
+      - type: tmpfs
+        target: /dev/shm
+    ports:
+      - "81:80"
+      - "9999:9000"
+    devices:
+      - "/dev/video0:/dev/video0"
+    environment:
+     - TZ=Europe/London
+     - VIRTUAL_HOST=zm.localhost, stream0.localhost
+     - SERVICE_PORTS="81"
+     - ZM_DB_HOST=db
+    restart: always
