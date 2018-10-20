@@ -168,6 +168,8 @@ networks:
   net:
     driver: overlay
 ```
+### Sample docker-compose.yml file
+The file docker-compose.yml.simple contains a sample file which installs a "simple" version of a docker-compose file
 
 above docker-compose.yml stack example asume a directory structure at $PWD as is
 
@@ -176,6 +178,9 @@ $PWD/mysql      # (MySQL Data, drwxr-xr-x 6   27 27)
 $PWD/zoneminder # (directory for images, drwxrwx--- 5 root 33)
 $PWD/backup     # (directory for backups, drwxr-xr-x 2 root root)
 $PWD/conf       # (configuration files, drwxrwxr-x  7 1000 1000, only conf/mysql/my.cnf is required)
+$PWD/revaliases # Your email server revaliases
+$PWD/ssmtp.conf # ssmtp.conf file
+
 cat conf/mysql/my.cnf
 # For advice on how to change settings please see
 # http://dev.mysql.com/doc/refman/5.7/en/server-configuration-defaults.html
@@ -228,6 +233,28 @@ the docker image used for load balancing is a modified version of dockercloud/ha
 using {{.Task.Slot}} placeholder in DNS name resolution, see more details at
 
 - <https://github.com/marcelo-ochoa/dockercloud-haproxy.git>
+
+
+### Sample revaliases file
+```
+root:xxx@gmail.com:smtp.gmail.com:587
+www-data:xxx@gmail.com:smtp.gmail.com:587
+```
+
+### sample sstp.conf file
+```
+root=xxx@gmail.com
+mailhub=smtp.gmail.com:587
+hostname=localhost
+RewriteDomain=gmail.com
+UseSTARTTLS=YES
+UseTLS=YES
+AuthUser=xxx@gmail.com
+AuthPass=<yourPassword>
+~                            
+```
+
+
 
 ## More Info
 

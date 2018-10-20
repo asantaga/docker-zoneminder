@@ -7,6 +7,9 @@ ENV TZ America/New_York
 
 # Update the container
 # Installation of nesesary package/software for this containers...
+# Angelo:  Added ZmEventServer Stuff
+# Angelo:  Added SSMTP support
+#
 RUN echo "deb http://ppa.launchpad.net/iconnor/zoneminder-master/ubuntu `cat /etc/container_environment/DISTRIB_CODENAME` main" >> /etc/apt/sources.list  \
     && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 776FFB04 \
     && echo $TZ > /etc/timezone && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends mariadb-server \
@@ -18,9 +21,19 @@ RUN echo "deb http://ppa.launchpad.net/iconnor/zoneminder-master/ubuntu `cat /et
                                         dialog \
                                         ntpdate \
                                         ffmpeg \
+ 					libyaml-perl \
+					make \
+					libjson-perl \
+					libcrypt-mysql-perl \
                     && apt-get clean \
                     && rm -rf /tmp/* /var/tmp/*  \
                     && rm -rf /var/lib/apt/lists/*
+
+# 
+RUN apt-get update
+RUN apt-get install -y ssmtp \
+                       mailutils
+
 
 # to add apache2 deamon to runit
 RUN mkdir -p /etc/service/apache2  /var/log/apache2 ; sync 
@@ -33,6 +46,7 @@ RUN chmod +x /etc/service/apache2/run \
 RUN mkdir -p /var/log/zm ; sync 
 COPY zm.sh /sbin/zm.sh
 RUN chmod +x /sbin/zm.sh
+
 
 ##startup scripts  
 #Pre-config scrip that maybe need to be run one time only when the container run the first time .. using a flag to don't 
@@ -60,6 +74,14 @@ RUN cd /usr/src \
     && rm /usr/src/cambozola-latest.tar.gz \
     && rm -R /usr/src/cambozola-0.936
 
+
+# Install ZMEventServer Perl Dep
+COPY installZMEventServer.sh /tmp/installZMEventServer.sh
+RUN chmod +x /tmp/installZMEventServer.sh
+RUN /tmp/installZMEventServer.sh
+
+
+#
 VOLUME /var/backups /var/cache/zoneminder
 # to allow access from outside of the container  to the container service
 # at that ports need to allow access from firewall if need to access it outside of the server. 
