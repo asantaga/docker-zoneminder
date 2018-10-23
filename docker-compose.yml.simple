@@ -40,4 +40,5 @@ services:
      - VIRTUAL_HOST=zm.localhost, stream0.localhost
      - SERVICE_PORTS="81"
      - ZM_DB_HOST=db
+    shm_size: 1000000000
     restart: always
