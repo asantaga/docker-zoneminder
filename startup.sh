@@ -9,6 +9,7 @@ mkdir -p /var/run/zm
 chown www-data:www-data /var/run/zm
 
 #to fix problem with data.timezone that appear at 1.28.108 for some reason
+# Commented out
 sed  -i "s|\;date.timezone =|date.timezone = \"${TZ:-America/New_York}\"|" /etc/php/7.2/apache2/php.ini
 #if ZM_DB_HOST variable is provided in container use it as is, if not left as localhost
 ZM_DB_HOST=${ZM_DB_HOST:-localhost}
@@ -41,12 +42,14 @@ else
         
         chown -R root:www-data /var/cache/zoneminder /etc/zm/zm.conf
         chmod -R 770 /var/cache/zoneminder /etc/zm/zm.conf
+# No longer required in 1.32
         echo "SET GLOBAL sql_mode = 'NO_ENGINE_SUBSTITUTION';" | mysql -u root -p$MYSQL_ROOT_PASSWORD -h $ZM_DB_HOST
         mysql -u root -p$MYSQL_ROOT_PASSWORD -h $ZM_DB_HOST < /usr/share/zoneminder/db/zm_create.sql   
         date > /var/cache/zoneminder/dbcreated
         #needed to fix problem with ubuntu ... and cron 
         update-locale
         date > /var/cache/zoneminder/configured
+# Commented out
         zmupdate.pl
         rm -rf /var/run/zm/* 
         /sbin/zm.sh&

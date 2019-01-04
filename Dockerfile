@@ -7,10 +7,11 @@ ENV TZ America/New_York
 
 # Update the container
 # Installation of nesesary package/software for this containers...
-# Angelo:  Added ZmEventServer Stuff
-# Angelo:  Added SSMTP support
+# ASANTAGA: Angelo:  Added ZmEventServer Stuff
+# ASANTAGA: Angelo:  Added SSMTP support
+# ASANTAGA: 3-Jan-2019 :  Modified ppa so it points to 1.32 not dev
 #
-RUN echo "deb http://ppa.launchpad.net/iconnor/zoneminder-master/ubuntu `cat /etc/container_environment/DISTRIB_CODENAME` main" >> /etc/apt/sources.list  \
+RUN echo "deb http://ppa.launchpad.net/iconnor/zoneminder-1.32/ubuntu `cat /etc/container_environment/DISTRIB_CODENAME` main" >> /etc/apt/sources.list  \
     && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 776FFB04 \
     && echo $TZ > /etc/timezone && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends mariadb-server \
                                         libvlc-dev  \
@@ -29,10 +30,13 @@ RUN echo "deb http://ppa.launchpad.net/iconnor/zoneminder-master/ubuntu `cat /et
                     && rm -rf /tmp/* /var/tmp/*  \
                     && rm -rf /var/lib/apt/lists/*
 
-# 
-RUN apt-get update
-RUN apt-get install -y ssmtp \
-                       mailutils
+
+# ASANTAGA: Add ssmtp Support to image 
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y ssmtp mailutils \
+    && apt-get clean \
+    && rm -rf /tmp/* /var/tmp/*  \
+    && rm -rf /var/lib/apt/lists/*
 
 
 # to add apache2 deamon to runit
@@ -62,7 +66,7 @@ RUN chmod +x /sbin/pre-conf ; sync \
     && /bin/bash -c /sbin/pre-conf \
     && rm /sbin/pre-conf
 
-##scritp that can be running from the outside using docker-bash tool ...
+## script that can be running from the outside using docker-bash tool ...
 ## for example to create backup for database with convitation of VOLUME   dockers-bash container_ID backup_mysql
 COPY backup.sh /sbin/backup
 RUN chmod +x /sbin/backup

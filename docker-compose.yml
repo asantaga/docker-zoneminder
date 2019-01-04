@@ -3,6 +3,7 @@ version: '3.2'
 services:
   db:
     image: mysql/mysql-server:5.7
+    container_name: ZoneminderDB
     hostname: db
     volumes:
       - ./mysql:/var/lib/mysql
@@ -17,14 +18,15 @@ services:
      - SERVICE_PORTS="81"
     restart: always
   web:
+    container_name: Zoneminder
     privileged: true
-    image: myzoneminder2:latest
+    image: myzoneminder_1.32:latest
     volumes:
       - /var/empty
       - /backups:/var/backups
       - ./zoneminder:/var/cache/zoneminder
-      - /media/2TB/zoneminder/events:/var/cache/zoneminder/events
-      - /media/2TB/zoneminder/images:/var/cache/zoneminder/images
+      - /mnt/2TB/zoneminder/events:/var/cache/zoneminder/events
+      - /mnt/2TB/zoneminder/images:/var/cache/zoneminder/images
       - ./zmeventnotification.ini:/etc/zmeventnotification.ini
       - ./revaliases:/etc/ssmtp/revaliases
       - ./ssmtp.conf:/etc/ssmtp/ssmtp.conf
@@ -32,7 +34,7 @@ services:
         target: /dev/shm
     ports:
       - "81:80"
-      - "9999:9000"
+      - "9002:9002"
     devices:
       - "/dev/video0:/dev/video0"
     environment:
@@ -40,4 +42,7 @@ services:
      - VIRTUAL_HOST=zm.localhost, stream0.localhost
      - SERVICE_PORTS="81"
      - ZM_DB_HOST=db
+    shm_size: 1000000000
     restart: always
+    depends_on:
+     - "db"
